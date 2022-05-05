@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { GetShortLivedTokenService } from './get-short-lived-token.service';
+import { TokenService } from './token.service';
 
 describe('GetShortLivedTokenService', () => {
-  let service: GetShortLivedTokenService;
+  let service: TokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(GetShortLivedTokenService);
+    service = TestBed.inject(TokenService);
   });
 
   it('should be created', () => {
