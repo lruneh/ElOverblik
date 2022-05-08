@@ -9,4 +9,8 @@
   </button>
 </mat-form-field>
 
-<div>Short lived token er: {{token}}</div>
+<div>Short lived token er: {{shortLivedToken}}</div>
+
+<div *ngFor="let meteringPoint of metoringPoints">MetringPoints er:  {{metoringPoints}}</div>
+
+<div *ngIf="test"> test er: {{test}}</div>
