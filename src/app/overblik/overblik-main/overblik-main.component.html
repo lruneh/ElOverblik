@@ -11,6 +11,4 @@
 
 <div>Short lived token er: {{shortLivedToken}}</div>
 
-<div *ngFor="let meteringPoint of metoringPoints">MetringPoints er:  {{metoringPoints}}</div>
-
-<div *ngIf="test"> test er: {{test}}</div>
+<div *ngIf="metoringPoints.result[0].streetCode"> streetCode: {{metoringPoints.result[0].streetCode}}</div>

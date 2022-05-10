@@ -1,5 +1,3 @@
-declare module namespace {
-
   export interface ChildMeteringPoint {
     parentMeteringPointId: string;
     meteringPointId: string;
@@ -8,7 +6,7 @@ declare module namespace {
     meterNumber: string;
   }
 
-  export interface Result {
+  export interface MeteringPointResult {
     streetCode: string;
     streetName: string;
     buildingNumber: string;
@@ -35,8 +33,5 @@ declare module namespace {
   }
 
   export interface RootObject {
-    result: Result[];
+    result: MeteringPointResult[];
   }
-
-}
-
