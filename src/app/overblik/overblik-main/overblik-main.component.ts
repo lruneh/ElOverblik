@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, pipe, map } from 'rxjs';
-import { MeteringPoint } from 'src/app/models/metering-point';
-import { MeteringPointResult, RootObject } from 'src/app/models/metering-points';
+import { plainToClass } from 'class-transformer';
+import { RootObject } from 'src/app/models/metering-points';
+import { RefreshToken } from 'src/app/models/refresh-token';
 import { TokenRepositoryService } from 'src/app/services/token-repositories/token-repository.service';
+import * as RefreshTokenJson from '../../../assets/refresh-token.json';
+import * as ShortLivedTokenJson from '../../../assets/short-lived-token.json';
+
 
 
 @Component({
@@ -14,32 +17,48 @@ export class OverblikMainComponent implements OnInit {
 
   title: string = "Overblik Main";
   value = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlblR5cGUiOiJDdXN0b21lckFQSV9SZWZyZXNoIiwidG9rZW5pZCI6IjAyNzc3ZTA2LWYxNmMtNGFjNy1hNGQwLTJkYzQzMjI4N2UxYiIsIndlYkFwcCI6WyJDdXN0b21lckFwaSIsIkN1c3RvbWVyQXBwQXBpIl0sImp0aSI6IjAyNzc3ZTA2LWYxNmMtNGFjNy1hNGQwLTJkYzQzMjI4N2UxYiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiUElEOjkyMDgtMjAwMi0yLTI0ODAyMzQ1NzY4MCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6Ikxhc3NlIFJ1bmUgSGFuc2VuIiwibG9naW5UeXBlIjoiS2V5Q2FyZCIsInBpZCI6IjkyMDgtMjAwMi0yLTI0ODAyMzQ1NzY4MCIsInR5cCI6IlBPQ0VTIiwidXNlcklkIjoiNDIzNDMiLCJleHAiOjE2ODMwNTI1OTcsImlzcyI6IkVuZXJnaW5ldCIsInRva2VuTmFtZSI6IkFuZ3VsYXIiLCJhdWQiOiJFbmVyZ2luZXQifQ.lYGhXT_e3ctieUlpCJZHcFrlfSlNnaZyY5Sd8b3gIZo';
-  shortLivedToken = 'blah';
-  metoringPoints: RootObject = {result: [{} ]} as RootObject;
+  shortLivedToken: RefreshToken = ShortLivedTokenJson;
+  metoringPoints: RootObject = { result: [{}] } as RootObject;
   skipShortLived: boolean = false;
   constructor(private _tokenService: TokenRepositoryService) { }
+  refreshToken: RefreshToken = RefreshTokenJson;
+  shortToken: any;
 
 
   test: any;
   ngOnInit(): void {
-  }
 
-  registerClick(value: string) {
-    value = `Bearer ${value}`;
-    if (!this.shortLivedToken) {
-      this._tokenService.getShortLivedToken(value).subscribe((data: { result: string; }) => {
-        this.shortLivedToken = data.result;
-      });
+    //todo: alt dette skal refaktoreres ud i metoder
+
+    let today = new Date;
+    //Is shortLivedToken out of date => check if RefreshToken is valid => get new ShortLivedToken
+    let shortTokenJson = JSON.stringify(this.shortLivedToken);
+    this.shortToken = plainToClass(RefreshToken, this.refreshToken);
+    let shortTokenDate = new Date(this.shortToken.date)
+    if (today.getTime() - shortTokenDate.getTime() > 0) {
+
+      //Get metering Points
     }
+    else {
+      //If refreshToken is out of date, ask for a new one => get new shortLivedToken
+      let refreshTokenJson = JSON.stringify(RefreshTokenJson);
+      let refreshToken = plainToClass(RefreshToken, this.refreshToken);
+      let refreshTokenDate = new Date(refreshToken.date);
 
-    this.shortLivedToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlblR5cGUiOiJDdXN0b21lckFQSV9EYXRhQWNjZXNzIiwidG9rZW5pZCI6IjVlMjE3M2JlLTA3MmQtNDZmYy05MTJiLTg0ZWJmYTQ1YTQ5ZCIsIndlYkFwcCI6WyJDdXN0b21lckFwaSIsIkN1c3RvbWVyQXBpIiwiQ3VzdG9tZXJBcHBBcGkiXSwianRpIjoiNWUyMTczYmUtMDcyZC00NmZjLTkxMmItODRlYmZhNDVhNDlkIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiJQSUQ6OTIwOC0yMDAyLTItMjQ4MDIzNDU3NjgwIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZ2l2ZW5uYW1lIjoiTGFzc2UgUnVuZSBIYW5zZW4iLCJsb2dpblR5cGUiOiJLZXlDYXJkIiwicGlkIjoiOTIwOC0yMDAyLTItMjQ4MDIzNDU3NjgwIiwidHlwIjoiUE9DRVMiLCJ1c2VySWQiOiI0MjM0MyIsImV4cCI6MTY1MjIwODczNCwiaXNzIjoiRW5lcmdpbmV0IiwidG9rZW5OYW1lIjoiQW5ndWxhciIsImF1ZCI6IkVuZXJnaW5ldCJ9.RiSwrwPO6fLS4vSd59bGqgvKL9ylyYsgKCxZYQxaX9A";
+      if (today.getTime() - refreshTokenDate.getTime() <= 0) {
+        //Ask for new RefreshToken => update the json file
 
-    if (this.shortLivedToken){
-      this._tokenService.getMeteringpoints(this.shortLivedToken).subscribe((data) => {
-        this.metoringPoints.result[0].streetCode = data.result[0].streetCode,
-        this.metoringPoints.result[0].streetName = data.result[0].streetName
+        //Get new ShortLivedToken => update the json file
+        this._tokenService.getShortLivedToken(`Bearer ${refreshToken.token}`).subscribe((data: { result: string; }) => {
+          this.shortLivedToken.date = today.toString();
+          this.shortLivedToken.token = data.result;
+        });
+      }
+      //Get new Short Lived Token =Z update the json file
+      this._tokenService.getShortLivedToken(`Bearer ${refreshToken.token}`).subscribe((data: { result: string; }) => {
+        this.shortLivedToken.date = today.toString();
+        this.shortLivedToken.token = data.result;
       });
-      this.skipShortLived = true;
     }
   }
 }
