@@ -32,6 +32,6 @@
     childMeteringPoints: ChildMeteringPoint[];
   }
 
-  export interface RootObject {
+  export interface MeteringPointRootObject {
     result: MeteringPointResult[];
   }

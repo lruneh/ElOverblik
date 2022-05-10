@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TokenResultat } from 'src/app/models/token';
 import { MeteringPoint } from 'src/app/models/metering-point';
-import { RootObject } from 'src/app/models/metering-points';
+import { MeteringPointRootObject } from 'src/app/models/metering-points';
 
 @Injectable({
   providedIn: 'root'
@@ -25,9 +25,9 @@ export class TokenRepositoryService {
       });
   }
 
-  public getMeteringpoints(token: string): Observable<RootObject> {
+  public getMeteringpoints(token: string): Observable<MeteringPointRootObject> {
     let meteringPoints = this.httpClient
-      .get<RootObject>(this.meteringPointUrl, {
+      .get<MeteringPointRootObject>(this.meteringPointUrl, {
         headers: { 'Authorization': token, 'accept': 'application/json' }
       });
 
