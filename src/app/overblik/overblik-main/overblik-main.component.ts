@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { plainToClass } from 'class-transformer';
 import { CookieService } from 'ngx-cookie-service';
-import { MeteringPoint } from 'src/app/models/metering-point';
+import { Aggregation } from 'src/app/models/aggregation';
 import { MeteringPointRootObject } from 'src/app/models/metering-points';
 import { RefreshToken } from 'src/app/models/refresh-token';
+import { MyEnergyDataMarketDocument, TimeSeriesRoot } from 'src/app/models/time-series';
+import { TimeSeriesRepositoryService } from 'src/app/services/time-series-repository/time-series-repository.service';
 import { TokenRepositoryService } from 'src/app/services/token-repositories/token-repository.service';
 import * as RefreshTokenJson from '../../../assets/refresh-token.json';
 import * as ShortLivedTokenJson from '../../../assets/short-lived-token.json';
@@ -21,10 +23,10 @@ export class OverblikMainComponent implements OnInit {
 
   shortLivedToken: RefreshToken = ShortLivedTokenJson;
   refreshToken: RefreshToken = RefreshTokenJson;
-
+  timeSeries: TimeSeriesRoot = { result: [] };
   metoringPoints: MeteringPointRootObject = { result: [{}] } as MeteringPointRootObject;
 
-  constructor(private _tokenService: TokenRepositoryService, private _cookieService: CookieService) { }
+  constructor(private _tokenService: TokenRepositoryService, private _timeSeriesRepositoryService: TimeSeriesRepositoryService, private _cookieService: CookieService) { }
 
   shortToken: RefreshToken = { token: '', date: '' };
 
@@ -34,7 +36,13 @@ export class OverblikMainComponent implements OnInit {
 
     //Get data
     this.initializeTokenOperations();
+    //this.getTimeSeries();
     this._cookieService.set('testCookie', JSON.stringify(this.shortLivedToken));
+  }
+  getTimeSeries() {
+    this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.shortToken.token}`, "2022-05-01", "2022-05-05", Aggregation.Day, this.metoringPoints.result[0].childMeteringPoints[1].meteringPointId).subscribe((data: { result: { MyEnergyData_MarketDocument: MyEnergyDataMarketDocument; }[]; }) => {
+      this.timeSeries.result[0].MyEnergyData_MarketDocument = data.result[0].MyEnergyData_MarketDocument;
+    });
   }
 
   private initializeTokenOperations() {

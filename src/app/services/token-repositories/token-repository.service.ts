@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TokenResultat } from 'src/app/models/token';
-import { MeteringPoint } from 'src/app/models/metering-point';
 import { MeteringPointRootObject } from 'src/app/models/metering-points';
 
 @Injectable({
@@ -31,6 +30,6 @@ export class TokenRepositoryService {
         headers: { 'Authorization': token, 'accept': 'application/json' }
       });
 
-      return meteringPoints;
+    return meteringPoints;
   }
 }

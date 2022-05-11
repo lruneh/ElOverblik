@@ -3,4 +3,18 @@
 
 <div>Short lived token er: {{shortToken.token}}</div>
 
-<div *ngIf="metoringPoints.result[0].streetCode"> streetCode: {{metoringPoints.result[0].streetCode}}</div>
+<div *ngIf="metoringPoints.result[0].streetCode">
+  streetName: {{metoringPoints.result[0].streetName}}
+
+  <div class="example-label">FAB</div>
+  <div class="example-button-row">
+    <div class="example-flex-container">
+      <div class="example-button-container">
+        <button mat-fab color="accent" (click)="getTimeSeries()" aria-label="Example icon button with a delete icon">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
