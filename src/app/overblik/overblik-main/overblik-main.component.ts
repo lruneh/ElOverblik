@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { plainToClass } from 'class-transformer';
 import { CookieService } from 'ngx-cookie-service';
 import { Aggregation } from 'src/app/models/aggregation';
+import { GraphData, GraphPoint, Graphs} from 'src/app/models/graph-data';
 import { MeteringPointRootObject } from 'src/app/models/metering-points';
 import { RefreshToken } from 'src/app/models/refresh-token';
-import { MyEnergyDataMarketDocument, TimeSeriesRoot } from 'src/app/models/time-series';
+import { MyEnergyDataMarketDocument, SenderMarketParticipantMRid, Result, PeriodTimeInterval, TimeInterval, Point, Period, TimeSeriesRoot, MRid, TimeSery, MarketEvaluationPoint } from 'src/app/models/time-series';
 import { TimeSeriesRepositoryService } from 'src/app/services/time-series-repository/time-series-repository.service';
 import { TokenRepositoryService } from 'src/app/services/token-repositories/token-repository.service';
 import * as RefreshTokenJson from '../../../assets/refresh-token.json';
@@ -23,8 +24,108 @@ export class OverblikMainComponent implements OnInit {
 
   shortLivedToken: RefreshToken = ShortLivedTokenJson;
   refreshToken: RefreshToken = RefreshTokenJson;
-  timeSeries: TimeSeriesRoot = { result: [] };
-  metoringPoints: MeteringPointRootObject = { result: [{}] } as MeteringPointRootObject;
+
+
+  MRid: MRid = {
+    codingScheme: '',
+    name: ''
+  };
+
+  SenderMarketParticipantMRid: SenderMarketParticipantMRid = {
+    codingScheme: '',
+    name: ''
+  };
+
+  MarketEvaluationPoint: MarketEvaluationPoint = {
+    mRID: this.MRid
+  };
+
+  Point: Point = {
+    "out_Quantity.quantity": '',
+    "out_Quantity.quality": '',
+    position: ''
+  };
+
+  TimeInterval: TimeInterval = {
+    end: '',
+    start: ''
+  }
+
+  Period: Period = {
+    resolution: '',
+    Point: [this.Point],
+    timeInterval: this.TimeInterval
+  };
+
+  TimeSery: TimeSery = {
+    mRID: '',
+    curveType: '',
+    businessType: '',
+    Period: [this.Period],
+    "measurement_Unit.name": '',
+    MarketEvaluationPoint: this.MarketEvaluationPoint
+  }
+
+  PeriodTimeInterval: PeriodTimeInterval = {
+end: '',
+start: ''
+  }
+
+  MyEnergyDataMarketDocument: MyEnergyDataMarketDocument = {
+    "period.timeInterval": this.PeriodTimeInterval,
+    "sender_MarketParticipant.mRID": this.SenderMarketParticipantMRid,
+    "sender_MarketParticipant.name": '',
+    mRID: '',
+    TimeSeries: [this.TimeSery],
+    createdDateTime: ''
+  }
+
+  TimeSeriesRoot: TimeSeriesRoot = {
+    result: [{
+      MyEnergyData_MarketDocument: this.MyEnergyDataMarketDocument,
+      errorCode: '',
+      errorText: '',
+      stackTrace: '',
+      id: '',
+      success: false
+    },
+    {
+      MyEnergyData_MarketDocument: this.MyEnergyDataMarketDocument,
+      errorCode: '',
+      errorText: '',
+      stackTrace: '',
+      id: '',
+      success: false
+    }]
+  }
+
+  Graphs: Graphs = {
+    data: [
+      {
+        Address: '',
+        MeteringPointType: '',
+        points:
+        [
+          {
+            PointTime: new Date,
+            Amount: ''
+          }
+        ] as GraphPoint[]
+      } as GraphData,
+      {
+        Address: '',
+        MeteringPointType: '',
+        points:
+        [
+          {
+            PointTime: new Date,
+            Amount: ''
+          }
+        ] as GraphPoint[]} as GraphData
+  ]
+}
+
+  meteringPoints: MeteringPointRootObject = { result: [{}, {}] } as MeteringPointRootObject;
 
   constructor(private _tokenService: TokenRepositoryService, private _timeSeriesRepositoryService: TimeSeriesRepositoryService, private _cookieService: CookieService) { }
 
@@ -40,9 +141,16 @@ export class OverblikMainComponent implements OnInit {
     this._cookieService.set('testCookie', JSON.stringify(this.shortLivedToken));
   }
   getTimeSeries() {
-    this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.shortToken.token}`, "2022-05-01", "2022-05-05", Aggregation.Day, this.metoringPoints.result[0].childMeteringPoints[1].meteringPointId).subscribe((data: { result: { MyEnergyData_MarketDocument: MyEnergyDataMarketDocument; }[]; }) => {
-      this.timeSeries.result[0].MyEnergyData_MarketDocument = data.result[0].MyEnergyData_MarketDocument;
+    this.meteringPoints.result[0].childMeteringPoints.forEach((element, index: number )=> {
+      this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.shortToken.token}`, "2022-05-01", "2022-05-05", Aggregation.Day, element.meteringPointId).subscribe(
+        (data: { result: { success: boolean, MyEnergyData_MarketDocument: MyEnergyDataMarketDocument; }[]; }) => {
+
+          //NU SKAL DET MAPPES TIL GRAPH I STEDET!!!
+        this.TimeSeriesRoot.result[index].MyEnergyData_MarketDocument = data.result[0].MyEnergyData_MarketDocument;
+        this.TimeSeriesRoot.result[index].success = data.result[0].success;
+      });
     });
+
   }
 
   private initializeTokenOperations() {
@@ -91,29 +199,32 @@ export class OverblikMainComponent implements OnInit {
 
   private getMeteringPoints() {
     this._tokenService.getMeteringpoints(`Bearer ${this.shortToken.token}`).subscribe((data) => {
-      this.metoringPoints.result[0].streetCode = data.result[0].streetCode,
-        this.metoringPoints.result[0].streetName = data.result[0].streetName,
-        this.metoringPoints.result[0].buildingNumber = data.result[0].buildingNumber,
-        this.metoringPoints.result[0].floorId = data.result[0].floorId,
-        this.metoringPoints.result[0].roomId = data.result[0].roomId,
-        this.metoringPoints.result[0].citySubDivisionName = data.result[0].citySubDivisionName,
-        this.metoringPoints.result[0].municipalityCode = data.result[0].municipalityCode,
-        this.metoringPoints.result[0].locationDescription = data.result[0].locationDescription,
-        this.metoringPoints.result[0].settlementMethod = data.result[0].settlementMethod,
-        this.metoringPoints.result[0].meterReadingOccurrence = data.result[0].meterReadingOccurrence,
-        this.metoringPoints.result[0].firstConsumerPartyName = data.result[0].firstConsumerPartyName,
-        this.metoringPoints.result[0].secondConsumerPartyName = data.result[0].secondConsumerPartyName,
-        this.metoringPoints.result[0].meterNumber = data.result[0].meterNumber,
-        this.metoringPoints.result[0].consumerStartDate = data.result[0].consumerStartDate,
-        this.metoringPoints.result[0].meteringPointId = data.result[0].meteringPointId,
-        this.metoringPoints.result[0].typeOfMP = data.result[0].typeOfMP,
-        this.metoringPoints.result[0].balanceSupplierName = data.result[0].balanceSupplierName,
-        this.metoringPoints.result[0].postcode = data.result[0].postcode,
-        this.metoringPoints.result[0].cityName = data.result[0].cityName,
-        this.metoringPoints.result[0].hasRelation = data.result[0].hasRelation,
-        this.metoringPoints.result[0].consumerCVR = data.result[0].consumerCVR,
-        this.metoringPoints.result[0].dataAccessCVR = data.result[0].dataAccessCVR,
-        this.metoringPoints.result[0].childMeteringPoints = data.result[0].childMeteringPoints;
+      data.result.forEach((element, index: number) => {
+        this.meteringPoints.result[index].streetCode = element.streetCode,
+        this.meteringPoints.result[index].streetName = element.streetName,
+        this.meteringPoints.result[index].buildingNumber = element.buildingNumber,
+        this.meteringPoints.result[index].floorId = element.floorId,
+        this.meteringPoints.result[index].roomId = element.roomId,
+        this.meteringPoints.result[index].citySubDivisionName = element.citySubDivisionName,
+        this.meteringPoints.result[index].municipalityCode = element.municipalityCode,
+        this.meteringPoints.result[index].locationDescription = element.locationDescription,
+        this.meteringPoints.result[index].settlementMethod = element.settlementMethod,
+        this.meteringPoints.result[index].meterReadingOccurrence = element.meterReadingOccurrence,
+        this.meteringPoints.result[index].firstConsumerPartyName = element.firstConsumerPartyName,
+        this.meteringPoints.result[index].secondConsumerPartyName = element.secondConsumerPartyName,
+        this.meteringPoints.result[index].meterNumber = element.meterNumber,
+        this.meteringPoints.result[index].consumerStartDate = element.consumerStartDate,
+        this.meteringPoints.result[index].meteringPointId = element.meteringPointId,
+        this.meteringPoints.result[index].typeOfMP = element.typeOfMP,
+        this.meteringPoints.result[index].balanceSupplierName = element.balanceSupplierName,
+        this.meteringPoints.result[index].postcode = element.postcode,
+        this.meteringPoints.result[index].cityName = element.cityName,
+        this.meteringPoints.result[index].hasRelation = element.hasRelation,
+        this.meteringPoints.result[index].consumerCVR = element.consumerCVR,
+        this.meteringPoints.result[index].dataAccessCVR = element.dataAccessCVR,
+        this.meteringPoints.result[index].childMeteringPoints = element.childMeteringPoints;
+      });
+
     });
   }
 

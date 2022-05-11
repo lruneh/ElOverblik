@@ -15,7 +15,7 @@ export class TimeSeriesRepositoryService {
     const body = `{
       "meteringPoints": {
         "meteringPoint": [
-          ${meteringPoint}
+          "${meteringPoint}"
         ]
       }
     }`
