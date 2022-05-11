@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { plainToClass } from 'class-transformer';
+import { CookieService } from 'ngx-cookie-service';
 import { MeteringPoint } from 'src/app/models/metering-point';
 import { MeteringPointRootObject } from 'src/app/models/metering-points';
 import { RefreshToken } from 'src/app/models/refresh-token';
@@ -17,31 +18,72 @@ import * as ShortLivedTokenJson from '../../../assets/short-lived-token.json';
 export class OverblikMainComponent implements OnInit {
 
   title: string = "Overblik Main";
-  value = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlblR5cGUiOiJDdXN0b21lckFQSV9SZWZyZXNoIiwidG9rZW5pZCI6IjAyNzc3ZTA2LWYxNmMtNGFjNy1hNGQwLTJkYzQzMjI4N2UxYiIsIndlYkFwcCI6WyJDdXN0b21lckFwaSIsIkN1c3RvbWVyQXBwQXBpIl0sImp0aSI6IjAyNzc3ZTA2LWYxNmMtNGFjNy1hNGQwLTJkYzQzMjI4N2UxYiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiUElEOjkyMDgtMjAwMi0yLTI0ODAyMzQ1NzY4MCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6Ikxhc3NlIFJ1bmUgSGFuc2VuIiwibG9naW5UeXBlIjoiS2V5Q2FyZCIsInBpZCI6IjkyMDgtMjAwMi0yLTI0ODAyMzQ1NzY4MCIsInR5cCI6IlBPQ0VTIiwidXNlcklkIjoiNDIzNDMiLCJleHAiOjE2ODMwNTI1OTcsImlzcyI6IkVuZXJnaW5ldCIsInRva2VuTmFtZSI6IkFuZ3VsYXIiLCJhdWQiOiJFbmVyZ2luZXQifQ.lYGhXT_e3ctieUlpCJZHcFrlfSlNnaZyY5Sd8b3gIZo';
+
   shortLivedToken: RefreshToken = ShortLivedTokenJson;
-  metoringPoints: MeteringPointRootObject = { result: [{}] } as MeteringPointRootObject;
-  skipShortLived: boolean = false;
-  constructor(private _tokenService: TokenRepositoryService) { }
   refreshToken: RefreshToken = RefreshTokenJson;
-  shortToken: any;
+
+  metoringPoints: MeteringPointRootObject = { result: [{}] } as MeteringPointRootObject;
+
+  constructor(private _tokenService: TokenRepositoryService, private _cookieService: CookieService) { }
+
+  shortToken: RefreshToken = { token: '', date: '' };
 
 
   test: any;
   ngOnInit(): void {
 
-    //todo: alt dette skal refaktoreres ud i metoder
+    //Get data
+    this.initializeTokenOperations();
+    this._cookieService.set('testCookie', JSON.stringify(this.shortLivedToken));
+  }
+
+  private initializeTokenOperations() {
     let today = new Date;
 
     //Is shortLivedToken out of date => check if RefreshToken is valid => get new ShortLivedToken
     this.shortToken = plainToClass(RefreshToken, this.shortLivedToken);
-    let shortTokenDate = new Date(this.shortToken.date)
-    let shortTokenDatePlusOneYear = shortTokenDate.setFullYear(shortTokenDate.getFullYear() + 1)
-
-    if(shortTokenDatePlusOneYear > today.getTime() ) {
+    if (this.shortTokenIsFresh(new Date(this.shortToken.date), today)) {
 
       //Get metering Points
-      this._tokenService.getMeteringpoints(`Bearer ${this.shortToken.token}`).subscribe((data) => {
-        this.metoringPoints.result[0].streetCode = data.result[0].streetCode,
+      this.getMeteringPoints();
+    }
+    else {
+      //If refreshToken is out of date, ask for a new one => get new shortLivedToken
+      let refreshToken = plainToClass(RefreshToken, this.refreshToken);
+      if (!this.refreshTokenIsFresh(new Date(refreshToken.date), today)) {
+        //Ask for new RefreshToken => update the json file
+        console.log('Getting new refreshToken is still not implemented.');
+        //Get new ShortLivedToken => update the json file
+        this.getNewShortLivedToken(refreshToken, today);
+      }
+      else {
+        //Get new Short Lived Token => update the json file
+        this.getNewShortLivedToken(refreshToken, today);
+      }
+    }
+  }
+
+  private shortTokenIsFresh(today: Date, tokenDate: Date): boolean {
+    let tokenExpirationDate = tokenDate.setDate(tokenDate.getDate() + 1)
+
+    if (tokenExpirationDate < today.getTime()) {
+      return false;
+    }
+    return true;
+  }
+
+  private refreshTokenIsFresh(today: Date, tokenDate: Date): boolean {
+    let tokenExpirationDate = tokenDate.setFullYear(tokenDate.getFullYear() + 1)
+
+    if (tokenExpirationDate < today.getTime()) {
+      return false;
+    }
+    return true;
+  }
+
+  private getMeteringPoints() {
+    this._tokenService.getMeteringpoints(`Bearer ${this.shortToken.token}`).subscribe((data) => {
+      this.metoringPoints.result[0].streetCode = data.result[0].streetCode,
         this.metoringPoints.result[0].streetName = data.result[0].streetName,
         this.metoringPoints.result[0].buildingNumber = data.result[0].buildingNumber,
         this.metoringPoints.result[0].floorId = data.result[0].floorId,
@@ -63,32 +105,15 @@ export class OverblikMainComponent implements OnInit {
         this.metoringPoints.result[0].hasRelation = data.result[0].hasRelation,
         this.metoringPoints.result[0].consumerCVR = data.result[0].consumerCVR,
         this.metoringPoints.result[0].dataAccessCVR = data.result[0].dataAccessCVR,
-        this.metoringPoints.result[0].childMeteringPoints = data.result[0].childMeteringPoints
-      });
-    }
-    else {
-      //If refreshToken is out of date, ask for a new one => get new shortLivedToken
-      let refreshToken = plainToClass(RefreshToken, this.refreshToken);
-      let refreshTokenDate = new Date(refreshToken.date);
-      let refreshTokenDatePlusOneYear = refreshTokenDate.setFullYear(refreshTokenDate.getFullYear() + 1)
+        this.metoringPoints.result[0].childMeteringPoints = data.result[0].childMeteringPoints;
+    });
+  }
 
-      if (refreshTokenDatePlusOneYear < today.getTime()) {
-        //Ask for new RefreshToken => update the json file
-
-        //Get new ShortLivedToken => update the json file
-        this._tokenService.getShortLivedToken(`Bearer ${refreshToken.token}`).subscribe((data: { result: string; }) => {
-          this.shortLivedToken.date = today.toString();
-          this.shortLivedToken.token = data.result;
-        });
-      }
-      else{
-//Get new Short Lived Token =Z update the json file
-this._tokenService.getShortLivedToken(`Bearer ${refreshToken.token}`).subscribe((data: { result: string; }) => {
-  this.shortLivedToken.date = today.toString();
-  this.shortLivedToken.token = data.result;
-});
-      }
-
-    }
+  private getNewShortLivedToken(refreshToken: RefreshToken, today: Date) {
+    this._tokenService.getShortLivedToken(`Bearer ${refreshToken.token}`).subscribe((data: { result: string; }) => {
+      this.shortLivedToken.date = today.toString();
+      this.shortLivedToken.token = data.result;
+      this._cookieService.set('shortLived', JSON.stringify(this.shortLivedToken));
+    });
   }
 }
