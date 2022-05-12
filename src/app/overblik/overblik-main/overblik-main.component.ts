@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { plainToClass } from 'class-transformer';
 import { CookieService } from 'ngx-cookie-service';
+import { map } from 'rxjs';
 import { Aggregation } from 'src/app/models/aggregation';
-import { GraphData, GraphPoint, Graphs} from 'src/app/models/graph-data';
+import { GraphData, GraphPoint, Graphs } from 'src/app/models/graph-data';
 import { MeteringPointRootObject } from 'src/app/models/metering-points';
 import { RefreshToken } from 'src/app/models/refresh-token';
 import { MyEnergyDataMarketDocument, SenderMarketParticipantMRid, Result, PeriodTimeInterval, TimeInterval, Point, Period, TimeSeriesRoot, MRid, TimeSery, MarketEvaluationPoint } from 'src/app/models/time-series';
@@ -11,6 +12,15 @@ import { TokenRepositoryService } from 'src/app/services/token-repositories/toke
 import * as RefreshTokenJson from '../../../assets/refresh-token.json';
 import * as ShortLivedTokenJson from '../../../assets/short-lived-token.json';
 
+
+type MyEnergyData = {
+  "period.timeInterval": PeriodTimeInterval;
+  "sender_MarketParticipant.mRID": SenderMarketParticipantMRid;
+  "sender_MarketParticipant.name": string;
+  mRID: string;
+  TimeSeries: [TimeSery];
+  createdDateTime: string;
+}
 
 
 @Component({
@@ -26,78 +36,78 @@ export class OverblikMainComponent implements OnInit {
   refreshToken: RefreshToken = RefreshTokenJson;
 
 
-  MRid: MRid = {
-    codingScheme: '',
-    name: ''
-  };
+  // MRid: MRid = {
+  //   codingScheme: '',
+  //   name: ''
+  // };
 
-  SenderMarketParticipantMRid: SenderMarketParticipantMRid = {
-    codingScheme: '',
-    name: ''
-  };
+  // SenderMarketParticipantMRid: SenderMarketParticipantMRid = {
+  //   codingScheme: '',
+  //   name: ''
+  // };
 
-  MarketEvaluationPoint: MarketEvaluationPoint = {
-    mRID: this.MRid
-  };
+  // MarketEvaluationPoint: MarketEvaluationPoint = {
+  //   mRID: this.MRid
+  // };
 
-  Point: Point = {
-    "out_Quantity.quantity": '',
-    "out_Quantity.quality": '',
-    position: ''
-  };
+  // Point: Point = {
+  //   "out_Quantity.quantity": '',
+  //   "out_Quantity.quality": '',
+  //   position: ''
+  // };
 
-  TimeInterval: TimeInterval = {
-    end: '',
-    start: ''
-  }
+  // TimeInterval: TimeInterval = {
+  //   end: '',
+  //   start: ''
+  // }
 
-  Period: Period = {
-    resolution: '',
-    Point: [this.Point],
-    timeInterval: this.TimeInterval
-  };
+  // Period: Period = {
+  //   resolution: '',
+  //   Point: [this.Point],
+  //   timeInterval: this.TimeInterval
+  // };
 
-  TimeSery: TimeSery = {
-    mRID: '',
-    curveType: '',
-    businessType: '',
-    Period: [this.Period],
-    "measurement_Unit.name": '',
-    MarketEvaluationPoint: this.MarketEvaluationPoint
-  }
+  // TimeSery: TimeSery = {
+  //   mRID: '',
+  //   curveType: '',
+  //   businessType: '',
+  //   Period: [this.Period],
+  //   "measurement_Unit.name": '',
+  //   MarketEvaluationPoint: this.MarketEvaluationPoint
+  // }
 
-  PeriodTimeInterval: PeriodTimeInterval = {
-end: '',
-start: ''
-  }
+  // PeriodTimeInterval: PeriodTimeInterval = {
+  //   end: '',
+  //   start: ''
+  // }
 
-  MyEnergyDataMarketDocument: MyEnergyDataMarketDocument = {
-    "period.timeInterval": this.PeriodTimeInterval,
-    "sender_MarketParticipant.mRID": this.SenderMarketParticipantMRid,
-    "sender_MarketParticipant.name": '',
-    mRID: '',
-    TimeSeries: [this.TimeSery],
-    createdDateTime: ''
-  }
+  // MyEnergyDataMarketDocument: MyEnergyDataMarketDocument = {
+  //   "period.timeInterval": this.PeriodTimeInterval,
+  //   "sender_MarketParticipant.mRID": this.SenderMarketParticipantMRid,
+  //   "sender_MarketParticipant.name": '',
+  //   mRID: '',
+  //   TimeSeries: [this.TimeSery],
+  //   createdDateTime: ''
+  // }
 
-  TimeSeriesRoot: TimeSeriesRoot = {
-    result: [{
-      MyEnergyData_MarketDocument: this.MyEnergyDataMarketDocument,
-      errorCode: '',
-      errorText: '',
-      stackTrace: '',
-      id: '',
-      success: false
-    },
-    {
-      MyEnergyData_MarketDocument: this.MyEnergyDataMarketDocument,
-      errorCode: '',
-      errorText: '',
-      stackTrace: '',
-      id: '',
-      success: false
-    }]
-  }
+  // TimeSeriesRoot: TimeSeriesRoot = {
+  //   result: [{
+  //     MyEnergyData_MarketDocument: this.MyEnergyDataMarketDocument,
+  //     errorCode: '',
+  //     errorText: '',
+  //     stackTrace: '',
+  //     id: '',
+  //     success: false
+  //   },
+  //   {
+  //     MyEnergyData_MarketDocument: this.MyEnergyDataMarketDocument,
+  //     errorCode: '',
+  //     errorText: '',
+  //     stackTrace: '',
+  //     id: '',
+  //     success: false
+  //   }]
+  // }
 
   Graphs: Graphs = {
     data: [
@@ -105,25 +115,26 @@ start: ''
         Address: '',
         MeteringPointType: '',
         points:
-        [
-          {
-            PointTime: new Date,
-            Amount: ''
-          }
-        ] as GraphPoint[]
+          [
+            {
+              PointTime: new Date,
+              Amount: ''
+            }
+          ] as GraphPoint[]
       } as GraphData,
       {
         Address: '',
         MeteringPointType: '',
         points:
-        [
-          {
-            PointTime: new Date,
-            Amount: ''
-          }
-        ] as GraphPoint[]} as GraphData
-  ]
-}
+          [
+            {
+              PointTime: new Date,
+              Amount: ''
+            }
+          ] as GraphPoint[]
+      } as GraphData
+    ]
+  }
 
   meteringPoints: MeteringPointRootObject = { result: [{}, {}] } as MeteringPointRootObject;
 
@@ -138,18 +149,29 @@ start: ''
     //Get data
     this.initializeTokenOperations();
     //this.getTimeSeries();
-    this._cookieService.set('testCookie', JSON.stringify(this.shortLivedToken));
+    //this._cookieService.set('refreshToken', JSON.stringify(this.refreshToken))
+    this._cookieService.set('shortToken', JSON.stringify(this.shortLivedToken));
   }
   getTimeSeries() {
-    this.meteringPoints.result[0].childMeteringPoints.forEach((element, index: number )=> {
+    this.meteringPoints.result.forEach((element, index) => {
       this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.shortToken.token}`, "2022-05-01", "2022-05-05", Aggregation.Day, element.meteringPointId).subscribe(
-        (data: { result: { success: boolean, MyEnergyData_MarketDocument: MyEnergyDataMarketDocument; }[]; }) => {
+        (data: { result: { MyEnergyData_MarketDocument: MyEnergyDataMarketDocument; }[]; }) => {
 
           //NU SKAL DET MAPPES TIL GRAPH I STEDET!!!
-        this.TimeSeriesRoot.result[index].MyEnergyData_MarketDocument = data.result[0].MyEnergyData_MarketDocument;
-        this.TimeSeriesRoot.result[index].success = data.result[0].success;
-      });
+          //this.Graphs.data[index].points[index].Amount = data.result[0].MyEnergyData_MarketDocument.TimeSeries[0].Period[0].Point[0]['out_Quantity.quantity']
+        });
     });
+
+
+    // this.meteringPoints.result[0].childMeteringPoints.forEach((element, index: number) => {
+    //   this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.shortToken.token}`, "2022-05-01", "2022-05-05", Aggregation.Day, element.meteringPointId).subscribe(
+    //     (data: { result: { success: boolean, MyEnergyData_MarketDocument: MyEnergyDataMarketDocument; }[]; }) => {
+
+    //       //NU SKAL DET MAPPES TIL GRAPH I STEDET!!!
+    //       this.TimeSeriesRoot.result[index].MyEnergyData_MarketDocument = data.result[0].MyEnergyData_MarketDocument;
+    //       this.TimeSeriesRoot.result[index].success = data.result[0].success;
+    //     });
+    // });
 
   }
 
@@ -201,28 +223,28 @@ start: ''
     this._tokenService.getMeteringpoints(`Bearer ${this.shortToken.token}`).subscribe((data) => {
       data.result.forEach((element, index: number) => {
         this.meteringPoints.result[index].streetCode = element.streetCode,
-        this.meteringPoints.result[index].streetName = element.streetName,
-        this.meteringPoints.result[index].buildingNumber = element.buildingNumber,
-        this.meteringPoints.result[index].floorId = element.floorId,
-        this.meteringPoints.result[index].roomId = element.roomId,
-        this.meteringPoints.result[index].citySubDivisionName = element.citySubDivisionName,
-        this.meteringPoints.result[index].municipalityCode = element.municipalityCode,
-        this.meteringPoints.result[index].locationDescription = element.locationDescription,
-        this.meteringPoints.result[index].settlementMethod = element.settlementMethod,
-        this.meteringPoints.result[index].meterReadingOccurrence = element.meterReadingOccurrence,
-        this.meteringPoints.result[index].firstConsumerPartyName = element.firstConsumerPartyName,
-        this.meteringPoints.result[index].secondConsumerPartyName = element.secondConsumerPartyName,
-        this.meteringPoints.result[index].meterNumber = element.meterNumber,
-        this.meteringPoints.result[index].consumerStartDate = element.consumerStartDate,
-        this.meteringPoints.result[index].meteringPointId = element.meteringPointId,
-        this.meteringPoints.result[index].typeOfMP = element.typeOfMP,
-        this.meteringPoints.result[index].balanceSupplierName = element.balanceSupplierName,
-        this.meteringPoints.result[index].postcode = element.postcode,
-        this.meteringPoints.result[index].cityName = element.cityName,
-        this.meteringPoints.result[index].hasRelation = element.hasRelation,
-        this.meteringPoints.result[index].consumerCVR = element.consumerCVR,
-        this.meteringPoints.result[index].dataAccessCVR = element.dataAccessCVR,
-        this.meteringPoints.result[index].childMeteringPoints = element.childMeteringPoints;
+          this.meteringPoints.result[index].streetName = element.streetName,
+          this.meteringPoints.result[index].buildingNumber = element.buildingNumber,
+          this.meteringPoints.result[index].floorId = element.floorId,
+          this.meteringPoints.result[index].roomId = element.roomId,
+          this.meteringPoints.result[index].citySubDivisionName = element.citySubDivisionName,
+          this.meteringPoints.result[index].municipalityCode = element.municipalityCode,
+          this.meteringPoints.result[index].locationDescription = element.locationDescription,
+          this.meteringPoints.result[index].settlementMethod = element.settlementMethod,
+          this.meteringPoints.result[index].meterReadingOccurrence = element.meterReadingOccurrence,
+          this.meteringPoints.result[index].firstConsumerPartyName = element.firstConsumerPartyName,
+          this.meteringPoints.result[index].secondConsumerPartyName = element.secondConsumerPartyName,
+          this.meteringPoints.result[index].meterNumber = element.meterNumber,
+          this.meteringPoints.result[index].consumerStartDate = element.consumerStartDate,
+          this.meteringPoints.result[index].meteringPointId = element.meteringPointId,
+          this.meteringPoints.result[index].typeOfMP = element.typeOfMP,
+          this.meteringPoints.result[index].balanceSupplierName = element.balanceSupplierName,
+          this.meteringPoints.result[index].postcode = element.postcode,
+          this.meteringPoints.result[index].cityName = element.cityName,
+          this.meteringPoints.result[index].hasRelation = element.hasRelation,
+          this.meteringPoints.result[index].consumerCVR = element.consumerCVR,
+          this.meteringPoints.result[index].dataAccessCVR = element.dataAccessCVR,
+          this.meteringPoints.result[index].childMeteringPoints = element.childMeteringPoints;
       });
 
     });

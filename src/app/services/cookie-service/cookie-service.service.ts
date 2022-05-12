@@ -6,7 +6,8 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class CookieServiceService {
 
-  private cookie_name = '';
+  private shortTokenCookie = '';
+  private refreshTokenCookie = '';
   private all_cookies: any = '';
 
   constructor(private cookieService: CookieService) {
@@ -26,7 +27,8 @@ export class CookieServiceService {
   }
 
   ngOnInit(): void {
-    this.cookie_name = this.cookieService.get('name');
+    this.shortTokenCookie = this.cookieService.get('shortToken');
+    this.refreshTokenCookie = this.cookieService.get('refreshToken');
     this.all_cookies = this.cookieService.getAll();  // get all cookies object
   }
 }
