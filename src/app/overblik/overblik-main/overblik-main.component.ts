@@ -1,27 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { plainToClass } from 'class-transformer';
 import { CookieService } from 'ngx-cookie-service';
-import { map } from 'rxjs';
 import { Aggregation } from 'src/app/models/aggregation';
-import { GraphData, GraphPoint, Graphs } from 'src/app/models/graph-data';
 import { MeteringPointRootObject } from 'src/app/models/metering-points';
 import { RefreshToken } from 'src/app/models/refresh-token';
-import { MyEnergyDataMarketDocument, SenderMarketParticipantMRid, Result, PeriodTimeInterval, TimeInterval, Point, Period, TimeSeriesRoot, MRid, TimeSery, MarketEvaluationPoint } from 'src/app/models/time-series';
+import { ShortLivedToken } from 'src/app/models/shortLivedToken';
+import { MyEnergyDataMarketDocument} from 'src/app/models/time-series';
 import { TimeSeriesRepositoryService } from 'src/app/services/time-series-repository/time-series-repository.service';
 import { TokenRepositoryService } from 'src/app/services/token-repositories/token-repository.service';
 import * as RefreshTokenJson from '../../../assets/refresh-token.json';
-import * as ShortLivedTokenJson from '../../../assets/short-lived-token.json';
-
-
-type MyEnergyData = {
-  "period.timeInterval": PeriodTimeInterval;
-  "sender_MarketParticipant.mRID": SenderMarketParticipantMRid;
-  "sender_MarketParticipant.name": string;
-  mRID: string;
-  TimeSeries: [TimeSery];
-  createdDateTime: string;
-}
-
 
 @Component({
   selector: 'app-overblik-main',
@@ -32,155 +19,55 @@ export class OverblikMainComponent implements OnInit {
 
   title: string = "Overblik Main";
 
-  shortLivedToken: RefreshToken = ShortLivedTokenJson;
+  shortToken: ShortLivedToken = new ShortLivedToken();
+
+
   refreshToken: RefreshToken = RefreshTokenJson;
-
-
-  // MRid: MRid = {
-  //   codingScheme: '',
-  //   name: ''
-  // };
-
-  // SenderMarketParticipantMRid: SenderMarketParticipantMRid = {
-  //   codingScheme: '',
-  //   name: ''
-  // };
-
-  // MarketEvaluationPoint: MarketEvaluationPoint = {
-  //   mRID: this.MRid
-  // };
-
-  // Point: Point = {
-  //   "out_Quantity.quantity": '',
-  //   "out_Quantity.quality": '',
-  //   position: ''
-  // };
-
-  // TimeInterval: TimeInterval = {
-  //   end: '',
-  //   start: ''
-  // }
-
-  // Period: Period = {
-  //   resolution: '',
-  //   Point: [this.Point],
-  //   timeInterval: this.TimeInterval
-  // };
-
-  // TimeSery: TimeSery = {
-  //   mRID: '',
-  //   curveType: '',
-  //   businessType: '',
-  //   Period: [this.Period],
-  //   "measurement_Unit.name": '',
-  //   MarketEvaluationPoint: this.MarketEvaluationPoint
-  // }
-
-  // PeriodTimeInterval: PeriodTimeInterval = {
-  //   end: '',
-  //   start: ''
-  // }
-
-  // MyEnergyDataMarketDocument: MyEnergyDataMarketDocument = {
-  //   "period.timeInterval": this.PeriodTimeInterval,
-  //   "sender_MarketParticipant.mRID": this.SenderMarketParticipantMRid,
-  //   "sender_MarketParticipant.name": '',
-  //   mRID: '',
-  //   TimeSeries: [this.TimeSery],
-  //   createdDateTime: ''
-  // }
-
-  // TimeSeriesRoot: TimeSeriesRoot = {
-  //   result: [{
-  //     MyEnergyData_MarketDocument: this.MyEnergyDataMarketDocument,
-  //     errorCode: '',
-  //     errorText: '',
-  //     stackTrace: '',
-  //     id: '',
-  //     success: false
-  //   },
-  //   {
-  //     MyEnergyData_MarketDocument: this.MyEnergyDataMarketDocument,
-  //     errorCode: '',
-  //     errorText: '',
-  //     stackTrace: '',
-  //     id: '',
-  //     success: false
-  //   }]
-  // }
-
-  Graphs: Graphs = {
-    data: [
-      {
-        Address: '',
-        MeteringPointType: '',
-        points:
-          [
-            {
-              PointTime: new Date,
-              Amount: ''
-            }
-          ] as GraphPoint[]
-      } as GraphData,
-      {
-        Address: '',
-        MeteringPointType: '',
-        points:
-          [
-            {
-              PointTime: new Date,
-              Amount: ''
-            }
-          ] as GraphPoint[]
-      } as GraphData
-    ]
-  }
 
   meteringPoints: MeteringPointRootObject = { result: [{}, {}] } as MeteringPointRootObject;
 
   constructor(private _tokenService: TokenRepositoryService, private _timeSeriesRepositoryService: TimeSeriesRepositoryService, private _cookieService: CookieService) { }
 
-  shortToken: RefreshToken = { token: '', date: '' };
-
-
+  myEnergyData: any[] = [];
   test: any;
   ngOnInit(): void {
 
     //Get data
     this.initializeTokenOperations();
     //this.getTimeSeries();
-    //this._cookieService.set('refreshToken', JSON.stringify(this.refreshToken))
-    this._cookieService.set('shortToken', JSON.stringify(this.shortLivedToken));
+    this._cookieService.set('refreshToken', JSON.stringify(this.refreshToken))
   }
   getTimeSeries() {
     this.meteringPoints.result.forEach((element, index) => {
-      this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.shortToken.token}`, "2022-05-01", "2022-05-05", Aggregation.Day, element.meteringPointId).subscribe(
+      this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.shortToken.token}`, "2022-01-01", "2022-05-14", Aggregation.Day, element.meteringPointId).subscribe(
         (data: { result: { MyEnergyData_MarketDocument: MyEnergyDataMarketDocument; }[]; }) => {
+          let points: object[] = [];
+          data.result[0].MyEnergyData_MarketDocument.TimeSeries[0].Period.forEach(element => {
+            const timeInterval = `${element.timeInterval.start} : ${element.timeInterval.end}`;
+            const pointMeasurement: string = element.Point[0]["out_Quantity.quantity"];
+             points.push({'timeInterval': timeInterval, 'pointQuantity': pointMeasurement});
 
-          //NU SKAL DET MAPPES TIL GRAPH I STEDET!!!
-          //this.Graphs.data[index].points[index].Amount = data.result[0].MyEnergyData_MarketDocument.TimeSeries[0].Period[0].Point[0]['out_Quantity.quantity']
+
+          });;
+          this.myEnergyData.push({'supplier': this.meteringPoints.result[index].balanceSupplierName, 'supplierTimeSeries': [points]})
+
         });
     });
-
-
-    // this.meteringPoints.result[0].childMeteringPoints.forEach((element, index: number) => {
-    //   this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.shortToken.token}`, "2022-05-01", "2022-05-05", Aggregation.Day, element.meteringPointId).subscribe(
-    //     (data: { result: { success: boolean, MyEnergyData_MarketDocument: MyEnergyDataMarketDocument; }[]; }) => {
-
-    //       //NU SKAL DET MAPPES TIL GRAPH I STEDET!!!
-    //       this.TimeSeriesRoot.result[index].MyEnergyData_MarketDocument = data.result[0].MyEnergyData_MarketDocument;
-    //       this.TimeSeriesRoot.result[index].success = data.result[0].success;
-    //     });
-    // });
-
   }
 
   private initializeTokenOperations() {
     let today = new Date;
 
     //Is shortLivedToken out of date => check if RefreshToken is valid => get new ShortLivedToken
-    this.shortToken = plainToClass(RefreshToken, this.shortLivedToken);
-    if (this.shortTokenIsFresh(new Date(this.shortToken.date), today)) {
+    let shortLivedCookie: ShortLivedToken = JSON.parse(this._cookieService.get('shortToken'));
+    // shortLivedCookie.date = JSON.parse(this._cookieService.get('shortToken'));
+    // shortLivedCookie.token = JSON.parse(this._cookieService.get('shortToken'));
+
+    this.shortToken.date = shortLivedCookie.date;
+    this.shortToken.token = shortLivedCookie.token;
+    //JSON.parse(this._cookieService.get('shortToken'));
+
+    if (this.shortToken.date && this.shortTokenIsFresh(today, new Date(this.shortToken.date))) {
 
       //Get metering Points
       this.getMeteringPoints();
@@ -210,7 +97,7 @@ export class OverblikMainComponent implements OnInit {
     return true;
   }
 
-  private refreshTokenIsFresh(today: Date, tokenDate: Date): boolean {
+  private refreshTokenIsFresh(tokenDate: Date, today: Date): boolean {
     let tokenExpirationDate = tokenDate.setFullYear(tokenDate.getFullYear() + 1)
 
     if (tokenExpirationDate < today.getTime()) {
@@ -252,9 +139,10 @@ export class OverblikMainComponent implements OnInit {
 
   private getNewShortLivedToken(refreshToken: RefreshToken, today: Date) {
     this._tokenService.getShortLivedToken(`Bearer ${refreshToken.token}`).subscribe((data: { result: string; }) => {
-      this.shortLivedToken.date = today.toString();
-      this.shortLivedToken.token = data.result;
-      this._cookieService.set('shortLived', JSON.stringify(this.shortLivedToken));
+      this.shortToken.date = today;
+      this.shortToken.token = data.result;
+      this._cookieService.set('shortToken', JSON.stringify(this.shortToken));
+      this.getMeteringPoints();
     });
   }
 }

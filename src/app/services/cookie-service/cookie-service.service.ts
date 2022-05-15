@@ -22,6 +22,10 @@ export class CookieServiceService {
     this.cookieService.delete('name');
   }
 
+  getCookie(name: string){
+    this.cookieService.get(name);
+  }
+
   deleteAll() {
     this.cookieService.deleteAll();
   }

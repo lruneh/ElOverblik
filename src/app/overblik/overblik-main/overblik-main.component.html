@@ -19,3 +19,17 @@
 
 </div>
 
+<div *ngIf="myEnergyData">
+  <div *ngFor="let energyData of myEnergyData">
+    <h1>{{energyData.supplier}}</h1>
+<div *ngFor="let points of energyData.supplierTimeSeries">
+  <div *ngFor="let point of points">
+    Her kommer noget info:
+    {{point.timeInterval}}
+    {{point.pointQuantity}}
+  </div>
+
+</div>
+  </div>
+</div>
+this.myEnergyData[0].myEnergy_MarketDocument[0].MyEnergyData_MarketDocument.TimeSeries[0].Period[0].Point[0]['out_Quantity.quantity']
