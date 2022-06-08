@@ -12,7 +12,7 @@ export class LineChartComponent {
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [
       {
-        data: [ 65, 59, 80, 81, 56, 55, 40 ],
+        data: [ 65, 59, 80, 81, 56, 55, 40, 33 ],
         label: 'Series A',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
@@ -23,7 +23,7 @@ export class LineChartComponent {
         fill: 'origin',
       },
       {
-        data: [ 28, 48, 40, 19, 86, 27, 110 ],
+        data: [ 28, 48, 40, 19, 86, 27, 110, 11 ],
         label: 'Series B',
         backgroundColor: 'rgba(77,83,96,0.2)',
         borderColor: 'rgba(77,83,96,1)',
@@ -34,7 +34,7 @@ export class LineChartComponent {
         fill: 'origin',
       }
     ],
-    labels: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July' ]
+    labels: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'september' ]
   };
 
   public lineChartOptions: ChartConfiguration['options'] = {
