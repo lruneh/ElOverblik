@@ -5,17 +5,19 @@ import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { OverblikMainComponent } from './overblik/overblik-main/overblik-main.component';
-
-import {MatInputModule} from '@angular/material/input';
-import { MatIconModule} from '@angular/material/icon';
+import { NgChartsModule } from 'ng2-charts';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CookieService } from 'ngx-cookie-service';
+import { LineChartComponent } from './overblik/charts/line-chart/line-chart.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    OverblikMainComponent
+    OverblikMainComponent,
+    LineChartComponent
   ],
   imports: [
     BrowserModule,
@@ -25,6 +27,7 @@ import { CookieService } from 'ngx-cookie-service';
     FormsModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    NgChartsModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent]
