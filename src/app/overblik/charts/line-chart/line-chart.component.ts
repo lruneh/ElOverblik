@@ -15,13 +15,7 @@ type Plot = {
 })
 export class LineChartComponent implements OnInit{
 
-  constructor() {
-  //   this.lineChartData = {
-  //   datasets:  [
-  //   { data: [], label: 'Data Set 1' },
-  //   ]
-  // }
-  }
+  constructor() {}
 
   @Input() myEnergyData: any[] = [];
 
@@ -33,6 +27,9 @@ export class LineChartComponent implements OnInit{
   pointLabels: string[] = [];
   supplier1: string = "";
   supplier2: string ="";
+
+  startDate: string ="";
+  endDate: string="";
 
   ngOnInit(): void {
     let test = this.myEnergyData[0]?.supplierTimeSeries[0].pointQuantity;

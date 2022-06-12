@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { plainToClass } from 'class-transformer';
 import { CookieService } from 'ngx-cookie-service';
 import { Aggregation } from 'src/app/models/aggregation';
 import { MeteringPointRootObject } from 'src/app/models/metering-points';
 import { ShortLivedToken } from 'src/app/models/shortLivedToken';
-import { MyEnergyDataMarketDocument } from 'src/app/models/time-series';
+import { FormGroup, FormControl } from '@angular/forms';
 import { TimeSeriesRepositoryService } from 'src/app/services/time-series-repository/time-series-repository.service';
 import { token, TokenRepositoryService } from 'src/app/services/token-repositories/token-repository.service';
+import { DateRange } from '@angular/material/datepicker';
 
 type ShortTokenObject = {
   token: string;
@@ -33,7 +34,23 @@ export class TokenTestComponent implements OnInit {
 
   errorMessage: string = "";
 
+  @Input() startDate: string ="";
+  @Input() endDate: string="";
+
+  dateRange = new FormGroup({
+    start: new FormControl(),
+    end: new FormControl()
+  });
+
   ngOnInit(): void {
+
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    this.dateRange.setValue({
+      start: firstDay,
+      end: new Date
+    })
 
     if(!this._cookieService.get('shortToken')){ //This needs to be something like the 2nd else
       this._cookieService.set('shortToken', JSON.stringify({token: this.tempShortToken, date: new Date}));
@@ -63,7 +80,10 @@ export class TokenTestComponent implements OnInit {
 
   getTimeSeries() {
     this.meteringPoints.result.forEach((element, index) => {
-      this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.tempShortToken}`, "2022-05-01", "2022-06-12", Aggregation.Day, element.meteringPointId)
+      let [start] = this.dateRange.get('start')?.value.toISOString().split('T');
+      let [end] = this.dateRange.get('end')?.value.toISOString().split('T');
+
+      this._timeSeriesRepositoryService.getTimeSeries(`Bearer ${this.tempShortToken}`, start, end, Aggregation.Day, element.meteringPointId)
       .subscribe({
         next: (data) => {
           let points: object[] = [];

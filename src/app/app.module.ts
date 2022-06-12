@@ -13,13 +13,18 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CookieService } from 'ngx-cookie-service';
 import { LineChartComponent } from './overblik/charts/line-chart/line-chart.component';
 import { TokenTestComponent } from './overblik/token-test/token-test.component';
+import { DateRangeComponent } from './date/date-range/date-range.component';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     AppComponent,
     OverblikMainComponent,
     LineChartComponent,
-    TokenTestComponent
+    TokenTestComponent,
+    DateRangeComponent
   ],
   imports: [
     BrowserModule,
@@ -29,7 +34,10 @@ import { TokenTestComponent } from './overblik/token-test/token-test.component';
     FormsModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    NgChartsModule
+    NgChartsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    ReactiveFormsModule
   ],
   providers: [CookieService],
   bootstrap: [AppComponent]
