@@ -1,18 +1,81 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
+
+
+type Plot = {
+  timeInterval: string;
+  pointQuantity: string;
+}
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line-chart.component.html',
   styleUrls: [ './line-chart.component.scss' ]
 })
-export class LineChartComponent {
+export class LineChartComponent implements OnInit{
+
+  constructor() {
+  //   this.lineChartData = {
+  //   datasets:  [
+  //   { data: [], label: 'Data Set 1' },
+  //   ]
+  // }
+  }
+
+  @Input() myEnergyData: any[] = [];
+
+  points: Plot[] = [];
+  points2: Plot[] = [];
+  pointQuantity: number[] = [];
+  pointQuantity2: number[] = [];
+  pointLabels: string[] = [];
+
+  ngOnInit(): void {
+    let test = this.myEnergyData[0]?.supplierTimeSeries[0].pointQuantity;
+
+    this.myEnergyData[0]?.supplierTimeSeries[0].forEach((element: Plot) => {
+      this.points.push(element);
+    });
+
+    this.points.forEach((point) => {
+      this.pointQuantity.push(parseFloat(point.pointQuantity));
+    });
+
+    this.points.forEach((point) =>{
+      let dateString = new Date(point.timeInterval.split(" ")[0]).toLocaleString('da-dk');
+      this.pointLabels.push(dateString);
+    })
+
+    this.myEnergyData[1]?.supplierTimeSeries[0].forEach((element: Plot) => {
+      this.points2.push(element);
+    });
+
+    this.points2.forEach((point) => {
+      this.pointQuantity2.push(parseFloat(point.pointQuantity));
+    });
+
+    if(this.myEnergyData.length > 1){
+      console.log("There is data in myEnergyData!");
+    }
+
+    // this.lineChartData.datasets[0] = {
+    //   data: this.pointQuantity,
+    //   label: 'Series A',
+    //     backgroundColor: 'rgba(148,159,177,0.2)',
+    //     borderColor: 'rgba(148,159,177,1)',
+    //     pointBackgroundColor: 'rgba(148,159,177,1)',
+    //     pointBorderColor: '#fff',
+    //     pointHoverBackgroundColor: '#fff',
+    //     pointHoverBorderColor: 'rgba(148,159,177,0.8)',
+    //     fill: 'origin',
+    // }
+  }
 
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [
       {
-        data: [ 65, 59, 80, 81, 56, 55, 40, 33 ],
+        data: this.pointQuantity,
         label: 'Series A',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
@@ -23,7 +86,7 @@ export class LineChartComponent {
         fill: 'origin',
       },
       {
-        data: [ 28, 48, 40, 19, 86, 27, 110, 11 ],
+        data: this.pointQuantity2,
         label: 'Series B',
         backgroundColor: 'rgba(77,83,96,0.2)',
         borderColor: 'rgba(77,83,96,1)',
@@ -34,7 +97,7 @@ export class LineChartComponent {
         fill: 'origin',
       }
     ],
-    labels: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'september' ]
+    labels: this.pointLabels,
   };
 
   public lineChartOptions: ChartConfiguration['options'] = {
@@ -98,10 +161,10 @@ export class LineChartComponent {
 
   // events
   public chartClicked({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
-    console.log(event, active);
+   // console.log(event, active);
   }
 
   public chartHovered({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
-    console.log(event, active);
+    //console.log(event, active);
   }
 }

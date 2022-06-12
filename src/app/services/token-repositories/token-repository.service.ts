@@ -1,8 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { TokenResultat } from 'src/app/models/token';
 import { MeteringPointRootObject } from 'src/app/models/metering-points';
+
+export type token= {
+  result: string;
+  }
+
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +27,13 @@ export class TokenRepositoryService {
       .get<TokenResultat>(this.apiUrl, {
         headers: { 'Authorization': token, 'accept': 'application/json' }
       });
+  }
+
+  public getShortLivedTokenTest(token: string): Observable<token> {
+    setTimeout(function() {
+      //your code to be executed after 1 second
+    }, 3000);
+    return of({result: "A very temporary token used during testing."});
   }
 
   public getMeteringpoints(token: string): Observable<MeteringPointRootObject> {

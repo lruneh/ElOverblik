@@ -12,12 +12,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CookieService } from 'ngx-cookie-service';
 import { LineChartComponent } from './overblik/charts/line-chart/line-chart.component';
+import { TokenTestComponent } from './overblik/token-test/token-test.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     OverblikMainComponent,
-    LineChartComponent
+    LineChartComponent,
+    TokenTestComponent
   ],
   imports: [
     BrowserModule,
