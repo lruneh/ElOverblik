@@ -23,7 +23,7 @@ export class CookieServiceService {
   }
 
   getCookie(name: string){
-    this.cookieService.get(name);
+    return this.cookieService.get(name);
   }
 
   deleteAll() {

@@ -29,7 +29,10 @@ export class LineChartComponent implements OnInit{
   points2: Plot[] = [];
   pointQuantity: number[] = [];
   pointQuantity2: number[] = [];
+  nettoExportQuantity: number[] = [];
   pointLabels: string[] = [];
+  supplier1: string = "";
+  supplier2: string ="";
 
   ngOnInit(): void {
     let test = this.myEnergyData[0]?.supplierTimeSeries[0].pointQuantity;
@@ -55,28 +58,24 @@ export class LineChartComponent implements OnInit{
       this.pointQuantity2.push(parseFloat(point.pointQuantity));
     });
 
+    this.supplier1 = this.myEnergyData[0].supplier;
+    this.supplier2 = this.myEnergyData[1].supplier;
+
+    this.pointQuantity2.forEach((point, index) => {
+      let diff = point - this.pointQuantity[index];
+      this.nettoExportQuantity.push(diff);
+    })
+
     if(this.myEnergyData.length > 1){
       console.log("There is data in myEnergyData!");
     }
-
-    // this.lineChartData.datasets[0] = {
-    //   data: this.pointQuantity,
-    //   label: 'Series A',
-    //     backgroundColor: 'rgba(148,159,177,0.2)',
-    //     borderColor: 'rgba(148,159,177,1)',
-    //     pointBackgroundColor: 'rgba(148,159,177,1)',
-    //     pointBorderColor: '#fff',
-    //     pointHoverBackgroundColor: '#fff',
-    //     pointHoverBorderColor: 'rgba(148,159,177,0.8)',
-    //     fill: 'origin',
-    // }
   }
 
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [
       {
         data: this.pointQuantity,
-        label: 'Series A',
+        label: 'Import af el (OK)',
         backgroundColor: 'rgba(148,159,177,0.2)',
         borderColor: 'rgba(148,159,177,1)',
         pointBackgroundColor: 'rgba(148,159,177,1)',
@@ -87,13 +86,25 @@ export class LineChartComponent implements OnInit{
       },
       {
         data: this.pointQuantity2,
-        label: 'Series B',
+        label: 'Eksport af el (NettoPower)',
         backgroundColor: 'rgba(77,83,96,0.2)',
         borderColor: 'rgba(77,83,96,1)',
         pointBackgroundColor: 'rgba(77,83,96,1)',
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: 'rgba(77,83,96,1)',
+        fill: 'origin',
+      }
+      ,
+      {
+        data: this.nettoExportQuantity,
+        label: 'Netto eksport af el (import - eksport)',
+        backgroundColor: 'rgba(277,93,96,0.2)',
+        borderColor: 'rgba(77,93,96,1)',
+        pointBackgroundColor: 'rgba(77,93,96,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(77,93,96,1)',
         fill: 'origin',
       }
     ],

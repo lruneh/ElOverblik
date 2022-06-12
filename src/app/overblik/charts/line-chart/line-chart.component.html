@@ -11,14 +11,3 @@
     </div>
   </div>
 </div>
-
-<div *ngIf="myEnergyData">
-  myEnergyData has been passed to the charts component.
-  <div *ngFor="let data of myEnergyData">
-    {{data.supplier}}
-  </div>
-</div>
-
-<div *ngFor="let data of lineChartData.datasets[0].data">
-  {{data}}
-</div>

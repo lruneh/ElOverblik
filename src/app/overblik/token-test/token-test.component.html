@@ -1,25 +1,3 @@
-<p>token-test works!</p>
-
-<div *ngIf="shortToken.result == ''">
-  Der er endnu ingen short lived token.
-</div>
-
-<div *ngIf="shortToken.result != ''">
-  Short lived token er: {{shortToken.result}}
-</div>
-
-<div *ngIf="myEnergyData">
-  <div *ngFor="let energyData of myEnergyData">
-    <h1>{{energyData.supplier}}</h1>
-<div *ngFor="let points of energyData.supplierTimeSeries">
-  <!-- <div *ngFor="let point of points">
-    Her kommer noget info:
-    {{point.timeInterval}}
-    {{point.pointQuantity}}
-  </div> -->
-
-</div>
-  </div>
-</div>
+<div>{{errorMessage}}</div>
 
 <app-line-chart *ngIf="myEnergyData.length > 1" [myEnergyData]="(myEnergyData)"></app-line-chart>
