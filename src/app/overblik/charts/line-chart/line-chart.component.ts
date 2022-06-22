@@ -14,6 +14,7 @@ type Plot = {
   styleUrls: [ './line-chart.component.scss' ]
 })
 export class LineChartComponent implements OnInit{
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
   constructor() {}
 
@@ -73,7 +74,7 @@ export class LineChartComponent implements OnInit{
       {
         data: this.pointQuantity,
         label: 'Import af el (OK)',
-        backgroundColor: 'rgba(148,159,177,0.2)',
+        backgroundColor: 'rgba(148,159,177,1)',
         borderColor: 'rgba(148,159,177,1)',
         pointBackgroundColor: 'rgba(148,159,177,1)',
         pointBorderColor: '#fff',
@@ -84,7 +85,7 @@ export class LineChartComponent implements OnInit{
       {
         data: this.pointQuantity2,
         label: 'Eksport af el (NettoPower)',
-        backgroundColor: 'rgba(77,83,96,0.2)',
+        backgroundColor: 'rgba(77,83,96,1)',
         borderColor: 'rgba(77,83,96,1)',
         pointBackgroundColor: 'rgba(77,83,96,1)',
         pointBorderColor: '#fff',
@@ -96,7 +97,7 @@ export class LineChartComponent implements OnInit{
       {
         data: this.nettoExportQuantity,
         label: 'Netto eksport af el (import - eksport)',
-        backgroundColor: 'rgba(277,93,96,0.2)',
+        backgroundColor: 'rgba(277,93,96,1)',
         borderColor: 'rgba(77,93,96,1)',
         pointBackgroundColor: 'rgba(77,93,96,1)',
         pointBorderColor: '#fff',
@@ -159,9 +160,9 @@ export class LineChartComponent implements OnInit{
     }
   };
 
-  public lineChartType: ChartType = 'line';
+  public lineChartType: ChartType = 'bar';
 
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+
 
   private static generateNumber(i: number): number {
     return Math.floor((Math.random() * (i < 2 ? 100 : 1000)) + 1);

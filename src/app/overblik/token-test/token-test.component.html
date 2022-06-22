@@ -13,12 +13,12 @@
 </mat-form-field>
 
 <p>Selected range: {{dateRange.value | json}}</p>
-<div>{{errorMessage}}</div>
+<div>{{errorMessage[0]}}</div>
 
-<div class="example-label">Raised</div>
+<div class="example-label">Raised button</div>
   <div class="example-button-row">
     Don't work yet!
-    <button mat-raised-button onClick="">Click this button to update timeseries</button>
+     <button mat-raised-button (click)="onUpdateDateRange(dateRange.value)">Update Timeseries</button>
   </div>
 
 <app-line-chart *ngIf="myEnergyData.length > 1" [myEnergyData]="(myEnergyData)"></app-line-chart>
