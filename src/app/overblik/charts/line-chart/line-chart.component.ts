@@ -33,7 +33,11 @@ export class LineChartComponent implements OnInit{
   endDate: string="";
 
   ngOnInit(): void {
-    let test = this.myEnergyData[0]?.supplierTimeSeries[0].pointQuantity;
+
+    //to-do:
+    //1) This needs refactoring.
+    //2) Sometimes supplier names get switched, so this needs to be fixed
+    //3) Chart is not rerendered, when timeseries are updated
 
     this.myEnergyData[0]?.supplierTimeSeries[0].forEach((element: Plot) => {
       this.points.push(element);

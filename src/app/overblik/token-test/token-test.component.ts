@@ -36,6 +36,8 @@ export class TokenTestComponent implements OnInit {
   myEnergyData: any[] = [];
   shortLivedDate: Date = new Date;
   shortLivedToken: string = "";
+  shortLIvedTOkenObject: ShortLivedToken = new ShortLivedToken();
+  shortLivedCookieMissing: boolean = true;
 
   errorMessage: string = "";
 
@@ -48,8 +50,11 @@ export class TokenTestComponent implements OnInit {
   });
 
   ngOnInit(): void {
-
-    let shortLivedCookie: ShortLivedToken = JSON.parse(this._cookieService.get('shortToken'));
+    let shortLivedCookie = this._cookieService.get('shortToken');
+    if(shortLivedCookie !== ""){
+      this.shortLIvedTOkenObject = JSON.parse(shortLivedCookie);
+      this.shortLivedCookieMissing = false;
+    }
 
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -59,16 +64,19 @@ export class TokenTestComponent implements OnInit {
       end: new Date
     })
 
-    if(!shortLivedCookie){ //This needs to be something like the 2nd else
-      this._cookieService.set('shortToken', JSON.stringify({token: this.tempShortToken, date: new Date}));
-      this.shortTokenObject = this._cookieService.get('shortToken');
-      let shortLivedCookie: ShortLivedToken = JSON.parse(this._cookieService.get('shortToken'));
-      this.shortToken.result = shortLivedCookie.token;
-      this.shortLivedToken = `Bearer ${this.shortToken.result}`;
-      this.shortLivedDate = shortLivedCookie.date;
-      this.getMeteringPoints();
+    if(this.shortLivedCookieMissing){
+      this._tokenService.getShortLivedToken(this.auth_token)
+    .subscribe({
+      next: (d) => {this.shortLivedToken = `Bearer ${d.result}`; this._cookieService.set('shortToken', JSON.stringify({token: d.result, date: new Date}));},
+      error: (e: any) => {console.log("There was an error getting the short lived token!"); console.log(e); this.errorMessage = e},
+      complete: () => {
+        console.log("Complete!");
+
+        this.getMeteringPoints();
+      }
+    });
     }
-    else if(this.shortTokenIsFresh(new Date, new Date(shortLivedCookie.date))){
+    else if(this.shortTokenIsFresh(new Date, new Date(this.shortLIvedTOkenObject.date))){
       console.log("Short token is fresh!");
       let shortLivedCookie: ShortLivedToken = JSON.parse(this._cookieService.get('shortToken'));
       this.shortToken.result = shortLivedCookie.token;
@@ -78,14 +86,14 @@ export class TokenTestComponent implements OnInit {
     else{
       this._tokenService.getShortLivedToken(this.auth_token)
     .subscribe({
-      next: (d) => {this.shortLivedToken = `Beare ${d.result}`; },
+      next: (d) => {this.shortLivedToken = `Bearer ${d.result}`; this._cookieService.set('shortToken', JSON.stringify({token: this.shortToken.result, date: new Date}));},
       error: (e: any) => {console.log("There was an error getting the short lived token!"); console.log(e); this.errorMessage = e},
       complete: () => {
         console.log("Complete!");
-        this._cookieService.set('shortToken', JSON.stringify({token: this.shortToken.result, date: new Date}));
+
         this.getMeteringPoints();
       }
-    })
+    });
     }
   }
 
