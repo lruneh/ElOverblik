@@ -68,7 +68,7 @@ export class TokenTestComponent implements OnInit {
       this._tokenService.getShortLivedToken(this.auth_token)
     .subscribe({
       next: (d) => {this.shortLivedToken = `Bearer ${d.result}`; this._cookieService.set('shortToken', JSON.stringify({token: d.result, date: new Date}));},
-      error: (e: any) => {console.log("There was an error getting the short lived token!"); console.log(e); this.errorMessage = e},
+      error: (e: any) => {this.handleErrorResponse(e, "There was an error getting the short lived token");},
       complete: () => {
         console.log("Complete!");
 
@@ -87,14 +87,25 @@ export class TokenTestComponent implements OnInit {
       this._tokenService.getShortLivedToken(this.auth_token)
     .subscribe({
       next: (d) => {this.shortLivedToken = `Bearer ${d.result}`; this._cookieService.set('shortToken', JSON.stringify({token: this.shortToken.result, date: new Date}));},
-      error: (e: any) => {console.log("There was an error getting the short lived token!"); console.log(e); this.errorMessage = e},
-      complete: () => {
+      error: (e: HttpErrorResponse) => {this.handleErrorResponse(e, "There was an error getting the short lived token");},
+            complete: () => {
         console.log("Complete!");
 
         this.getMeteringPoints();
       }
     });
     }
+  }
+  handleErrorResponse(e: HttpErrorResponse, callOrigin: string) {
+    console.log(callOrigin);
+    this.errorMessage = e.message;
+    console.log("Status is: " + e.status.valueOf());
+    console.log("Status is: " + e.status.toLocaleString());
+    console.log("Error is: "+e.error);
+    console.log("Error message is: ",+e.message.toString());
+    console.log("Type is: "+e.type);
+    console.log("Status text is: "+e.statusText);
+    console.log(e);
   }
 
   getTimeSeries() {
@@ -115,7 +126,7 @@ export class TokenTestComponent implements OnInit {
           });
           this.myEnergyData.push({'supplier': this.meteringPoints.result[index].balanceSupplierName, 'supplierTimeSeries': [points]})
         },
-        error: (e) => {console.log(`There was an error getting the time series: ${e}`); this.errorMessage = e},
+        error: (e) => {this.handleErrorResponse(e, "There was an error getting the Time series");},
         complete: () => {console.log("Getting the time series was completed succesfully!"); }
       })
     })
@@ -151,7 +162,7 @@ export class TokenTestComponent implements OnInit {
             this.meteringPoints.result[index].childMeteringPoints = element.childMeteringPoints;
         })
       },
-      error: (e: HttpErrorResponse) => {console.log(`There was an error getting the metering points: ${e.status + ' ' + e.message}`); },
+      error: (e: HttpErrorResponse) => {this.handleErrorResponse(e, "There was an error getting the metering points");},
       complete: () => {console.log("Getting the metering points completed succesfully, now getting the time series..."); this.getTimeSeries();}
 
     });

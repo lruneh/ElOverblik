@@ -25,7 +25,7 @@ export class TokenRepositoryService {
   public getShortLivedToken(token: string): Observable<TokenResultat> {
     return this.httpClient
       .get<TokenResultat>(this.apiUrl, {
-        headers: { 'Authorization': token, 'accept': 'application/json' }
+        headers: { 'Authorization': token, 'accept': 'application/json', observe: 'response' },
       });
   }
 
@@ -39,7 +39,7 @@ export class TokenRepositoryService {
   public getMeteringpoints(token: string): Observable<MeteringPointRootObject> {
     let meteringPoints = this.httpClient
       .get<MeteringPointRootObject>(this.meteringPointUrl, {
-        headers: { 'Authorization': token, 'accept': 'application/json' }
+        headers: { 'Authorization': token, 'accept': 'application/json', observe: 'response' }
       });
 
     return meteringPoints;
