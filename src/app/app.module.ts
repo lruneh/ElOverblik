@@ -17,6 +17,7 @@ import { DateRangeComponent } from './date/date-range/date-range.component';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { KonsolComponent } from './overblik/konsol/konsol.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     OverblikMainComponent,
     LineChartComponent,
     TokenTestComponent,
-    DateRangeComponent
+    DateRangeComponent,
+    KonsolComponent
   ],
   imports: [
     BrowserModule,
