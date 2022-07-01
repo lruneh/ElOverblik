@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-konsol',
@@ -9,6 +10,7 @@ export class KonsolComponent implements OnInit {
 
   constructor() { }
 
+  @Input() consoleText: Observable<string> = of("");
   ngOnInit(): void {
   }
 
