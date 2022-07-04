@@ -57,3 +57,19 @@
     height: 5em;
   }
 }
+
+.topBar{
+  border: 1px solid black;
+  width: 100%;
+
+  .left{
+    border: 1px solid black;
+    width: 49%;
+    float: left;
+  }
+
+  .right{
+    width: 49%;
+    float: right;
+  }
+}

@@ -10,7 +10,7 @@ export class KonsolComponent implements OnInit {
 
   constructor() { }
 
-  @Input() consoleText: Observable<string> = of("");
+  @Input() consoleText: Observable<string> = of("Here be the console!");
   ngOnInit(): void {
   }
 

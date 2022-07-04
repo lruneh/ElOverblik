@@ -25,8 +25,9 @@ type ShortTokenObject = {
 })
 export class TokenTestComponent implements OnInit {
 
-
   constructor(private _tokenService: TokenRepositoryService, private _timeSeriesRepositoryService: TimeSeriesRepositoryService, private _cookieService: CookieService){};
+
+  consoleText: string = "";
 
   auth_token: string = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlblR5cGUiOiJDdXN0b21lckFQSV9SZWZyZXNoIiwidG9rZW5pZCI6IjAyNzc3ZTA2LWYxNmMtNGFjNy1hNGQwLTJkYzQzMjI4N2UxYiIsIndlYkFwcCI6WyJDdXN0b21lckFwaSIsIkN1c3RvbWVyQXBwQXBpIl0sImp0aSI6IjAyNzc3ZTA2LWYxNmMtNGFjNy1hNGQwLTJkYzQzMjI4N2UxYiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiUElEOjkyMDgtMjAwMi0yLTI0ODAyMzQ1NzY4MCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6Ikxhc3NlIFJ1bmUgSGFuc2VuIiwibG9naW5UeXBlIjoiS2V5Q2FyZCIsInBpZCI6IjkyMDgtMjAwMi0yLTI0ODAyMzQ1NzY4MCIsInR5cCI6IlBPQ0VTIiwidXNlcklkIjoiNDIzNDMiLCJleHAiOjE2ODMwNTI1OTcsImlzcyI6IkVuZXJnaW5ldCIsInRva2VuTmFtZSI6IkFuZ3VsYXIiLCJhdWQiOiJFbmVyZ2luZXQifQ.lYGhXT_e3ctieUlpCJZHcFrlfSlNnaZyY5Sd8b3gIZo";
   tempShortToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlblR5cGUiOiJDdXN0b21lckFQSV9EYXRhQWNjZXNzIiwidG9rZW5pZCI6IjJkZTgzMzZmLTFjYWUtNGFjZi05YzkyLTQ0OTE3MGZjNTk5NiIsIndlYkFwcCI6WyJDdXN0b21lckFwaSIsIkN1c3RvbWVyQXBpIiwiQ3VzdG9tZXJBcHBBcGkiXSwianRpIjoiMmRlODMzNmYtMWNhZS00YWNmLTljOTItNDQ5MTcwZmM1OTk2IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiJQSUQ6OTIwOC0yMDAyLTItMjQ4MDIzNDU3NjgwIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZ2l2ZW5uYW1lIjoiTGFzc2UgUnVuZSBIYW5zZW4iLCJsb2dpblR5cGUiOiJLZXlDYXJkIiwicGlkIjoiOTIwOC0yMDAyLTItMjQ4MDIzNDU3NjgwIiwidHlwIjoiUE9DRVMiLCJ1c2VySWQiOiI0MjM0MyIsImV4cCI6MTY1NTY2MTExOCwiaXNzIjoiRW5lcmdpbmV0IiwidG9rZW5OYW1lIjoiQW5ndWxhciIsImF1ZCI6IkVuZXJnaW5ldCJ9.P5AibYv9n4cSXvZtETfZl8goujyan9YCkkBeWaJM12Y";
@@ -71,13 +72,14 @@ export class TokenTestComponent implements OnInit {
       error: (e: any) => {this.handleErrorResponse(e, "There was an error getting the short lived token"); this.updateSpinner()},
       complete: () => {
         console.log("Complete!");
-
+        this.consoleText = "Getting shortLived token is completed succesfully!";
         this.getMeteringPoints();
       }
     });
     }
     else if(this.shortTokenIsFresh(new Date, new Date(this.shortLIvedTOkenObject.date))){
       console.log("Short token is fresh!");
+      this.consoleText = "Short token is fresh!";
       let shortLivedCookie: ShortLivedToken = JSON.parse(this._cookieService.get('shortToken'));
       this.shortToken.result = shortLivedCookie.token;
       this.shortLivedToken = `Bearer ${this.shortToken.result}`;
@@ -89,8 +91,7 @@ export class TokenTestComponent implements OnInit {
       next: (d) => {this.shortLivedToken = `Bearer ${d.result}`; this._cookieService.set('shortToken', JSON.stringify({token: this.shortToken.result, date: new Date}));},
       error: (e: HttpErrorResponse) => {this.handleErrorResponse(e, "There was an error getting the short lived token"); this.updateSpinner();},
             complete: () => {
-        console.log("Complete!");
-
+              this.consoleText = "Getting shortLived token is completed succesfully!";
         this.getMeteringPoints();
       }
     });
@@ -114,6 +115,7 @@ export class TokenTestComponent implements OnInit {
     console.log("Type is: "+e.type);
     console.log("Status text is: "+e.statusText);
     console.log(e);
+    this.consoleText = callOrigin + '\n' + e.message;
   }
 
   getTimeSeries() {
